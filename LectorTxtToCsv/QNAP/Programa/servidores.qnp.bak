@@ -1,0 +1,59 @@
+& muestra1.qnp
+
+& Modelo de servidores
+
+/DECLARE/
+  QUEUE   FUENTE;  & Genera los clientes
+  QUEUE   SERVIDOR;    & SERVIDOR VIRTUAL/REAL
+  INTEGER N; & 
+  INTEGER M; &MAQUINAS
+  REAL    T;       & TIEMPO DE SIMULACION
+  REAL    INTERV;  & Intervalo de tiempo entre llegadas
+  REAL    TPROCESS;    & Tiempo de process
+  REAL    ESPERA; & tiempo de espera en scheduling 
+  REAL    COCUESP; & Coeficiente cuadratico de tiempo de espera
+  REAL    TRESP;   &tiempo de respuesta
+
+/STATION/
+  NAME = FUENTE;
+  TYPE = SOURCE;
+  SERVICE = EXP(INTERV);
+  TRANSIT = SERVIDOR;
+
+/STATION/
+  NAME = SERVIDOR;
+  TYPE = MULTIPLE(M);
+  SERVICE =
+          BEGIN
+             EXP(TPROCESS/M);
+          END;
+  TRANSIT = OUT;
+
+/CONTROL/
+  TMAX=T;
+  ACCURACY=ALL QUEUE;
+
+/EXEC/
+  BEGIN
+    FOR M:=2 STEP 2 UNTIL 64 DO
+    BEGIN 
+    PRINT("................................ ");
+    PRINT(" ");
+    PRINT("Numero de servidores ................................ ", M); 
+    ESPERA:=5.74275;
+    PRINT(" ");
+    INTERV:=0.58886;
+    TPROCESS:=2.92415;
+    FOR N:=5 STEP 5 UNTIL 95 DO
+   BEGIN;
+    INTERV:=(TPROCESS/M)*100/N;
+    SOLVE;
+    TRESP:=MRESPONSE(SERVIDOR);
+    PRINT(" ");
+    PRINT(" ");
+    PRINT("Tiempo medio de respuesta ................................ ", TRESP);
+    PRINT("ocupado ................................ ", MBUSYPCT(SERVIDOR));
+   END;
+   END;
+  END;
+/END/
